@@ -3,7 +3,7 @@ import '../css/nicepage.css'
 
 const User = ({user, selectUser}) => {
     return(
-        <div>
+        <div style={{height: 'fit-content'}}>
             <style>
                 {`
                 .u-section-1 .u-sheet-1 {

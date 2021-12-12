@@ -11,14 +11,17 @@ body {
 }
 
 nav {
-  display: flex !important;
+  display: flex !important; 
+  position: absolute;
   align-items: center;
+  width: 100%;
   justify-content: space-between;
   height: 70px;
   padding: 0px 20px;
   background-color: var(--dark-color);
   color: white;
   border-bottom: 1px solid;
+  z-index: 2;
 }
 
 nav a {

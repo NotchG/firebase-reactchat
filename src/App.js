@@ -16,8 +16,8 @@ function App() {
   return (
     <AuthProvider>
     <BrowserRouter>
-    <body>
     <Navbar />
+    <body style={{height: '100%', paddingTop: '69px'}}>
     <Routes>
       <Route path='/register' element={<Register/>} />
       <Route path='/' element={<PrivateRoute><Chat /></PrivateRoute>} />  

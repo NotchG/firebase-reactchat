@@ -2,7 +2,6 @@ import React, { useState , useEffect} from "react";
 import { db, auth } from "../firebase";
 import {collection, query, where, onSnapshot, getDoc, doc, updateDoc} from 'firebase/firestore'
 import User from '../components/User'
-import { Navigate } from "react-router-dom";
 
 const Friends = () => {
     const [friends, setFriends] = useState([]);
@@ -13,6 +12,7 @@ const Friends = () => {
         loading: false
     })
     const [currentuserselected, setCurrentUserSelected] = useState(null)
+    const [friendStr, setFriendStr] = useState('');
 
     const {friendname, loading} = data
 
@@ -28,7 +28,7 @@ const Friends = () => {
                         friendss.push(doc.data())
                     });
                     setUsers(friendss)
-                    setFriendres(users)
+                    setFriendres(friendss)
                 })
                 return () => unsub()
             }
@@ -43,12 +43,15 @@ const Friends = () => {
                         let friends = docSnap.data().friends.split(' ')
                         console.log('getting friends')
                         friends.push(auth.currentUser.uid)
+                        setFriendStr(docSnap.data().friends)
                         setFriends(friends)
                     } else {
                         let friends = []
                         console.log('no friends')
-                        friends.push(auth.currentUser.uid)
+                        friends.push(auth.currentUser.uid)    
+                        setFriendStr('')
                         setFriends(friends)
+
                     }
                 }
             })
@@ -83,22 +86,20 @@ const Friends = () => {
     const addFriend = async () => {
         if (!loading) {
         setData({...data, loading: true})
-        let final = friends
-        //final.push(currentuserselected.uid)
-        let idx = final.indexOf(auth.currentUser.uid)
-        let finalstring = ''
-        if (idx < 0) {
-            finalstring = final.join(' ')
+        let final = friendStr + ' ' + currentuserselected.uid
+        await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+            friends: final.trim()
+        })
+        let finalwithmine = ''
+        if (final.includes(auth.currentUser.uid)) {
+          finalwithmine = final
         } else {
-            finalstring = final.splice(idx, 1).join(' ')
+          finalwithmine = auth.currentUser.uid + ' ' + final
         }
-        console.log(friends)
-        console.log(idx)
-        console.log(finalstring)
-        console.log('mine: ' + auth.currentUser.uid)
-        /*await updateDoc(doc(db, 'users', auth.currentUser.uid), {
-            friends: finalstring
-        })*/
+        setFriends(finalwithmine.trim().split(' '))
+        setFriendStr(finalwithmine.trim())
+        console.log(finalwithmine.trim())
+        setCurrentUserSelected(null)
         setData({...data, loading: false})      
         }
     }
@@ -217,7 +218,7 @@ const Friends = () => {
                   }
                 `}
             </style>
-        <div className="u-form u-form-1" style={{position: 'relative', bottom: '0'}}>
+        <div className="u-form u-form-1">
           <form className="u-clearfix u-form-horizontal u-form-spacing-0 u-inner-form" source="custom" name="form" style={{padding: '0px'}} onSubmit={handleSubmit}>
             <div className="u-form-group u-form-name">
               <label for="name-5e66" className="u-form-control-hidden u-label"></label>
@@ -229,10 +230,10 @@ const Friends = () => {
             </div>
           </form>       
       </div>
-      <section className="u-clearfix u-section-1" id="sec-0554" style={{marginTop:'-1px',width: '20%',borderStyle:'solid', borderColor:'black', borderWidth:'0 5px 0 0', overflowY: 'scroll', height: '92vh'}}>
+      <section className="u-clearfix u-section-1" id="sec-0554" style={{width: '20%',borderStyle:'solid', borderColor:'black', borderWidth:'0 5px 0 0', overflowY: 'scroll', height: '100vh'}}>
       <div className="u-clearfix u-sheet u-sheet-1" style={{width: '100%'}}>
         <div className="u-list u-list-1" style={{marginLeft: 'auto', marginRight: 'auto', width:'auto', margin:'10px'}}>
-          <div className="u-repeater u-repeater-1">
+          <div className="u-repeater u-repeater-1" style={{minHeight: '0'}}>
               {friendres.map((user) => (
                   <User key={user.uid} user={user} selectUser={selectUser}/>
               ))}
@@ -241,9 +242,9 @@ const Friends = () => {
         </div>
     </section>
       {(currentuserselected) ? (
-            <div style={{float: 'right', width: '80%', marginTop: '-1px', paddingLeft: '10px', marginTop: '-92vh'}}>
-                <h3 class="u-text u-text-default u-text-7">{currentuserselected.name}</h3>
-        <p class="u-small-text u-text u-text-default u-text-variant u-text-8" style={{marginTop: '-10px'}}>{currentuserselected.isOnline ? 'online' : 'offline'}</p>
+            <div style={{float: 'right', width: '80%', paddingLeft: '10px', marginTop: '-100vh'}}>
+                <h3 className="u-text u-text-default u-text-7">{currentuserselected.name}</h3>
+        <p className="u-small-text u-text u-text-default u-text-variant u-text-8" style={{marginTop: '-10px'}}>{currentuserselected.isOnline ? 'online' : 'offline'}</p>
         <hr />
         <button className="u-btn u-btn-submit u-button-style u-btn-1" onClick={addFriend} disabled={loading}>Add Friend</button>
       </div>

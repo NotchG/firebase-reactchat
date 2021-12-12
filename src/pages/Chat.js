@@ -160,10 +160,10 @@ const Chat = () => {
                   }
                 `}
             </style>
-        <section className="u-clearfix u-section-1" id="sec-0554" style={{marginTop:'-1px', float: 'left',width: '20%',borderStyle:'solid', borderColor:'black', borderWidth:'0 5px 0 0', overflowY: 'scroll', height: '92vh'}}>
+        <section className="u-clearfix u-section-1" id="sec-0554" style={{float: 'left',width: '20%',borderStyle:'solid', borderColor:'black', borderWidth:'0 5px 0 0', overflowY: 'scroll', height: 'calc(100vh - 70px)'}}>
       <div className="u-clearfix u-sheet u-sheet-1" style={{width: '100%'}}>
         <div className="u-list u-list-1" style={{marginLeft: 'auto', marginRight: 'auto', width:'auto', margin:'10px'}}>
-          <div className="u-repeater u-repeater-1">
+          <div className="u-repeater u-repeater-1" style={{minHeight: '0'}}>
               {users.map((user) => (
                   <User key={user.uid} user={user} selectUser={selectUser}/>
               ))}
@@ -172,11 +172,26 @@ const Chat = () => {
         </div>
     </section>
     {chat ? (
-            <div style={{float: 'right', width: '80%', marginTop: '-1px', paddingLeft: '10px'}}>
-                <h3 class="u-text u-text-default u-text-7">{chat.name}</h3>
-        <p class="u-small-text u-text u-text-default u-text-variant u-text-8" style={{marginTop: '-10px'}}>{chat.isOnline ? 'online' : 'offline'}</p>
+            <div style={{float: 'right', width: '80%', paddingLeft: '10px', paddingRight: '10px'}}>
+              <div style={{height: '100px'}}>
+                <h3 className="u-text u-text-default u-text-7">{chat.name}</h3>
+        <p className="u-small-text u-text u-text-default u-text-variant u-text-8" style={{marginTop: '-10px'}}>{chat.isOnline ? 'online' : 'offline'}</p>
         <hr />
-        <MessageForm />
+        </div>
+        <table style={{width: '100%', height: 'calc(100vh - 170px)', backgroundColor: 'red'}}>
+          <tr>  
+            <td valign="top">
+              <div>
+                chat
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td valign='bottom'>
+            <MessageForm Disabled={chat.friends ? !chat.friends.includes(auth.currentUser.uid) : true}/>
+            </td>
+          </tr>
+        </table>
       </div>
         ) : null}
         </div>
