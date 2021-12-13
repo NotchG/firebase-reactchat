@@ -1,14 +1,21 @@
 import React, {useEffect, useState} from "react";
-import { db, auth } from "../firebase";
-import {collection, query, where, onSnapshot, getDoc, doc} from 'firebase/firestore'
+import { db, auth, storage } from "../firebase";
+import {collection, query, where, onSnapshot, getDoc, doc, addDoc, orderBy, Timestamp} from 'firebase/firestore'
 import User from '../components/User'
 import '../css/nicepage.css'
 import MessageForm from "../components/MessageForm";
+import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
+import Message from "../components/Message";
 
 const Chat = () => {
     const [users, setUsers] = useState([]);
     const [chat, setChat] = useState();
     const [friends, setFriends] = useState();
+    const [text, setText] = useState('');
+    const [img, setImg] = useState('')
+    const [msgs, setMsgs] = useState([]);
+
+    const user1 = auth.currentUser.uid;
 
     useEffect(() => {
       const queryFriends = () => {
@@ -46,9 +53,47 @@ const Chat = () => {
               getFriends()
             }
     }, [friends])
+
     const selectUser = (user) => {
         setChat(user);
         console.log(user);
+
+        const user2 = user.uid
+        const id = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}` 
+
+        const msgsRef = collection(db, 'messages', id, 'chat')
+        const q = query(msgsRef, orderBy('createdAt', 'asc'))
+
+        onSnapshot(q, querySnap => {
+          let msgs = []
+          querySnap.forEach(doc => {
+            msgs.push(doc.data())
+          })
+          setMsgs(msgs)
+        })
+    }
+    console.log(msgs)
+
+    const handleSubmit = async (e) => {
+      e.preventDefault()
+      const user2 = chat.uid
+      const id = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}` 
+      let url ;
+      if(img) {
+        const imgRef = ref(storage, `images/${new Date().getTime} - ${img.name}`)
+        const snap = await uploadBytes(imgRef, img)
+        const dlurl = await getDownloadURL(ref(storage, snap.ref.fullPath))
+        url = dlurl;
+      }
+      await addDoc(collection(db, 'messages', id, 'chat'), {
+        text,
+        from: user1,
+        to: user2,
+        createdAt: Timestamp.fromDate(new Date()),
+        media: url || ''
+      })
+      setText('')
+      setImg(null)
     }
     return(
         <div>
@@ -178,17 +223,17 @@ const Chat = () => {
         <p className="u-small-text u-text u-text-default u-text-variant u-text-8" style={{marginTop: '-10px'}}>{chat.isOnline ? 'online' : 'offline'}</p>
         <hr />
         </div>
-        <table style={{width: '100%', height: 'calc(100vh - 170px)', backgroundColor: 'red'}}>
-          <tr>  
+        <table style={{width: '100%', height: 'calc(100vh - 190px)'}}>
+          <tr style={{height: '100%'}}>  
             <td valign="top">
-              <div>
-                chat
+              <div style={{overflowY: 'scroll', height: '100%', width: '100%'}}>
+                {msgs.length ? msgs.map((msg, i) =><Message key={i} msg={msg} />) : null}
               </div>
             </td>
           </tr>
           <tr>
             <td valign='bottom'>
-            <MessageForm Disabled={chat.friends ? !chat.friends.includes(auth.currentUser.uid) : true}/>
+            <MessageForm setImg={setImg} handleSubmit={handleSubmit} text={text} setText={setText} Disabled={chat.friends ? !chat.friends.includes(auth.currentUser.uid) : true}/>
             </td>
           </tr>
         </table>
