@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import { db, auth, storage } from "../firebase";
-import {collection, query, where, onSnapshot, getDoc, doc, addDoc, orderBy, Timestamp} from 'firebase/firestore'
+import {collection, query, where, onSnapshot, getDoc, doc, addDoc, orderBy, serverTimestamp} from 'firebase/firestore'
 import User from '../components/User'
 import '../css/nicepage.css'
 import MessageForm from "../components/MessageForm";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import Message from "../components/Message";
+import '../sound/horn.mp3'
 
 const Chat = () => {
     const [users, setUsers] = useState([]);
@@ -14,6 +15,7 @@ const Chat = () => {
     const [text, setText] = useState('');
     const [img, setImg] = useState('')
     const [msgs, setMsgs] = useState([]);
+    const [loading, setLoading] = useState(false)
 
     const user1 = auth.currentUser.uid;
 
@@ -62,21 +64,30 @@ const Chat = () => {
         const id = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}` 
 
         const msgsRef = collection(db, 'messages', id, 'chat')
-        const q = query(msgsRef, orderBy('createdAt', 'asc'))
+        const q = query(msgsRef, orderBy('createdAt', 'desc'))
 
         onSnapshot(q, querySnap => {
           let msgs = []
           querySnap.forEach(doc => {
             msgs.push(doc.data())
           })
+          if (!querySnap.metadata.hasPendingWrites) {
           setMsgs(msgs)
+          if (msgs[0]) {
+            if (msgs[0].text[0] === ':' && msgs[0].text[msgs[0].text.length - 1] === ':') {
+              alert(msgs[0].text.replaceAll(':', ''))
+            }
+          }
+        }
+          setLoading(false)
         })
     }
-    console.log(msgs)
 
     const handleSubmit = async (e) => {
       e.preventDefault()
-      const user2 = chat.uid
+      if (text.trim() !== '') {
+        setLoading(true)
+        const user2 = chat.uid
       const id = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}` 
       let url ;
       if(img) {
@@ -85,15 +96,16 @@ const Chat = () => {
         const dlurl = await getDownloadURL(ref(storage, snap.ref.fullPath))
         url = dlurl;
       }
+      setText('')
       await addDoc(collection(db, 'messages', id, 'chat'), {
         text,
         from: user1,
         to: user2,
-        createdAt: Timestamp.fromDate(new Date()),
+        createdAt: serverTimestamp(),
         media: url || ''
       })
-      setText('')
       setImg(null)
+      }
     }
     return(
         <div>
@@ -226,14 +238,14 @@ const Chat = () => {
         <table style={{width: '100%', height: 'calc(100vh - 190px)'}}>
           <tr style={{height: '100%'}}>  
             <td valign="top">
-              <div style={{overflowY: 'scroll', height: '100%', width: '100%'}}>
+              <div style={{overflowY: 'auto', height: 'calc(100vh - 250px)', width: '100%', display: 'flex', flexDirection: 'column-reverse'}}>
                 {msgs.length ? msgs.map((msg, i) =><Message key={i} msg={msg} />) : null}
               </div>
             </td>
           </tr>
           <tr>
             <td valign='bottom'>
-            <MessageForm setImg={setImg} handleSubmit={handleSubmit} text={text} setText={setText} Disabled={chat.friends ? !chat.friends.includes(auth.currentUser.uid) : true}/>
+            <MessageForm setImg={setImg} handleSubmit={handleSubmit} text={text} setText={setText} Disabled={chat.friends ? !chat.friends.includes(auth.currentUser.uid) : true} loading={loading}/>
             </td>
           </tr>
         </table>

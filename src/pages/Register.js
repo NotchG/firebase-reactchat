@@ -112,7 +112,7 @@ const Register = () => {
           }
         }
           `}</style>
-        <section className="u-align-center u-clearfix u-grey-10 u-section-1" id="sec-5280">
+        <section className="u-align-center u-clearfix u-section-1" id="sec-5280" style={{backgroundColor: '#EDF3F8'}}>
       <div className="u-clearfix u-sheet u-valign-middle u-sheet-1">
         <div className="u-align-center u-container-style u-group u-radius-50 u-shape-round u-white u-group-1">
           <div className="u-container-layout u-container-layout-1">
@@ -121,18 +121,18 @@ const Register = () => {
               <form action="#" method="POST" className="u-clearfix u-form-custom-backend u-form-spacing-35 u-form-vertical u-inner-form" source="custom" name="form-2" style={{padding: '10px'}} onSubmit={handleSubmit}>
                 <div className="u-form-group u-form-name">
                   <label for="username-708d" className="u-label">Username</label>
-                  <input type="text" placeholder="Enter your Username" id="username-708d" name="name" className="u-grey-5 u-input u-input-rectangle" required="" value={name} onChange={handleChange}/>
+                  <input type="text" placeholder="Enter your Username" id="username-708d" name="name" className="u-grey-5 u-input u-input-rectangle" required="" autoComplete="off" value={name} onChange={handleChange}/>
                 </div>
                 <div className="u-form-group u-form-group-2">
                   <label for="text-9db8" className="u-label">Email</label>
-                  <input type="email" id="text-9db8" name="email" className="u-grey-5 u-input u-input-rectangle" placeholder="Enter your Email" required="required" value={email} onChange={handleChange}/>
+                  <input type="email" id="text-9db8" name="email" className="u-grey-5 u-input u-input-rectangle" placeholder="Enter your Email" required="required" autoComplete="off" value={email} onChange={handleChange}/>
                 </div>
                 <div className="u-form-group u-form-password">
                   <label for="password-708d" className="u-label">Password</label>
-                  <input type="password" placeholder="Enter your Password" id="password-708d" name="password" className="u-grey-5 u-input u-input-rectangle" required="" value={password} onChange={handleChange}/>
+                  <input type="password" placeholder="Enter your Password" id="password-708d" name="password" className="u-grey-5 u-input u-input-rectangle" required="" autoComplete="off" value={password} onChange={handleChange}/>
                 </div>
                 <div className="u-align-center u-form-group u-form-submit">
-                  <button className="u-btn u-btn-round u-btn-submit u-button-style u-radius-17 u-btn-1" disabled={loading}>{loading ? 'Creating' : 'Sign Up'}<br />
+                  <button className="u-btn u-btn-round u-btn-submit u-button-style u-radius-17 u-btn-1" style={{backgroundColor: '#09BC8A'}} disabled={loading}>{loading ? 'Creating' : 'Sign Up'}<br />
                   </button>
                   <input type="submit" value="submit" className="u-form-control-hidden" />
                 </div>

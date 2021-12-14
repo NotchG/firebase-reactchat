@@ -7,8 +7,10 @@ import '../css/nicepage.css'
 const Profile = () => {
     const [image, setImage] = useState('');
     const [user, setUser] = useState();
+    const [loading, setloading] = useState(false);
 
     useEffect(() => {
+      const getUser = () => {
         getDoc(doc(db, 'users', auth.currentUser.uid)).then(docSnap => {
             if(docSnap.exists) {
                 try{
@@ -20,7 +22,11 @@ const Profile = () => {
                 //setUser(docSnap.data())
             }
         })
+      }
+      const getImg = () => {
         if (image) {
+          setloading(true)
+          console.log('Uploading Image')
             const uploadImg = async () => {
                 const imgRef = ref(storage, `avatar/${new Date().getTime()} - ${image.name}`)
                 try {
@@ -34,14 +40,22 @@ const Profile = () => {
                     avatar: url,
                     avatarPath: snap.ref.fullPath,
                 })
+                getUser()
                 setImage('')
                 } catch (e) {
                     alert(e.message)
                 }
+                setloading(false)
             }
             uploadImg()
         }
-    }, [])
+      }
+        if (user) {
+          getImg()
+        } else {
+          getUser()
+        }
+    }, [image])
 
     return user ? (
         <div>
@@ -162,10 +176,10 @@ const Profile = () => {
                 <div className="u-container-layout u-container-layout-1">
                   <div alt="" className="u-image u-image-circle u-image-1" src="" data-image-width="256" data-image-height="256"></div>
                   <label for="photo" className="u-label">
-                  <div className="u-border-none u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-dark-3 u-radius-50 u-btn-1">Upload Image<br />
+                  <div className="u-border-none u-btn u-btn-round u-button-style u-hover-palette-1-light-1  u-radius-50 u-btn-1" style={{backgroundColor: '#172A3A'}}>{loading ? 'Uploading..' : 'Upload Image'}<br />
                   </div>
                   </label>
-                  <input type='file' accept='image/*' style={{display:'none'}} id='photo' onChange={e => setImage(e.target.files[0])}/>
+                  <input type='file' accept='image/*' style={{display:'none'}} id='photo' onChange={e => setImage(e.target.files[0])} disabled={loading}/>
                 </div>
               </div>
               <div className="u-align-left u-container-style u-layout-cell u-right-cell u-size-37 u-layout-cell-2">

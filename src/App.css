@@ -3,11 +3,11 @@
 }
 
 body {
-  background-color: #e5e5e5;
+  background-color: #EDF3F8;
 }
 
 :root {
-  --dark-color: #141313;
+  --dark-color: #172A3A;
 }
 
 nav {
@@ -19,13 +19,13 @@ nav {
   height: 70px;
   padding: 0px 20px;
   background-color: var(--dark-color);
-  color: white;
+  color: #E2E2E2;
   border-bottom: 1px solid;
   z-index: 2;
 }
 
 nav a {
-  color: white;
+  color: #E2E2E2;
   text-decoration: none;
 }
 
