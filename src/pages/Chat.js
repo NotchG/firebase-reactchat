@@ -6,7 +6,9 @@ import '../css/nicepage.css'
 import MessageForm from "../components/MessageForm";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import Message from "../components/Message";
-import '../sound/horn.mp3'
+import horn from '../sound/horn.mp3'
+import amogus from '../sound/Amogus.mp3'
+import {Howl, Howler} from 'howler'
 
 const Chat = () => {
     const [users, setUsers] = useState([]);
@@ -56,6 +58,13 @@ const Chat = () => {
             }
     }, [friends])
 
+    const PlaySound = (src) => {
+      const sound = new Howl({
+        src: src
+      })
+      sound.play()
+    }
+
     const selectUser = (user) => {
         setChat(user);
         console.log(user);
@@ -74,8 +83,10 @@ const Chat = () => {
           if (!querySnap.metadata.hasPendingWrites) {
           setMsgs(msgs)
           if (msgs[0]) {
-            if (msgs[0].text[0] === ':' && msgs[0].text[msgs[0].text.length - 1] === ':') {
-              alert(msgs[0].text.replaceAll(':', ''))
+            if (msgs[0].text === ':horn:') {
+              PlaySound(horn)
+            } else if (msgs[0].text === ':amogus:') {
+              PlaySound(amogus)
             }
           }
         }
@@ -107,6 +118,7 @@ const Chat = () => {
       setImg(null)
       }
     }
+    Howler.volume(1.0)
     return(
         <div>
             <style>
