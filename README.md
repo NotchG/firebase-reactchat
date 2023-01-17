@@ -1,4 +1,5 @@
-![Notchg inc (2)](https://user-images.githubusercontent.com/64884560/212838765-52c02e58-8478-4561-afc7-f92f9dcba7f2.png)
+![Logo](https://user-images.githubusercontent.com/64884560/212840108-710c26ea-ea9c-48e7-bc15-d0f5aa23ead1.png)
+
 # Firebase React Chat
 
 A firebase app for learning the react app while simultaneously being a chat app for general use.
